@@ -1,6 +1,7 @@
 import { useState } from "react";
 import "./FormRequest.css";
 import Modal from "./Modal";
+import MyComponent from "./MyComponent";
 
 export default function FormRequest() {
   const [loanInputs, setloanInputs] = useState({
@@ -10,14 +11,23 @@ export default function FormRequest() {
     isEmployee: false,
     salaryRange: "",
   });
-
+  const data = [
+    { title: "Name: ", name: "name", value: loanInputs.name, type: "text" },
+    {
+      title: "Phone Number: ",
+      name: "phone",
+      value: loanInputs.phone,
+      type: "tel",
+    },
+    { title: "Age:  ", name: "age", value: loanInputs.age, type: "number" },
+  ];
   const [ShowModal, setShowModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
 
   const btnIsDisabled =
     loanInputs.name.trim() === "" ||
     loanInputs.phone.trim() === "" ||
-    loanInputs.age.trim() === "" ||
+    loanInputs.age === "" ||
     loanInputs.salaryRange === "";
 
   function handleFormSubmit(event) {
@@ -38,62 +48,28 @@ export default function FormRequest() {
       setShowModal(false);
     }
   }
+  function handleChange(event) {
+    const { name, type, value, checked } = event.target;
+    setloanInputs((prev) => ({
+      ...prev,
+      [name]: type !== "checkbox" ? value : checked,
+    }));
+  }
   return (
     <div className="form-container" onClick={handleDivClick}>
       <form id="loan-form">
         <h1>Requesting a Loan</h1>
         <hr />
-        <div className="form-group">
-          <label htmlFor="name">Name: </label>
-          <input
-            className="form-control"
-            type="text"
-            id="name"
-            name="name"
-            autoComplete="off"
-            value={loanInputs.name}
-            onChange={(event) => {
-              setloanInputs({ ...loanInputs, name: event.target.value });
-            }}
-            required
+        {data.map((item, index) => (
+          <MyComponent
+            key={index}
+            name={item.name}
+            title={item.title}
+            value={item.value}
+            type={item.type}
+            handleChange={handleChange}
           />
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="phone">Phone Number: </label>
-          <input
-            className="form-control"
-            type="tel"
-            id="phone"
-            name="phone"
-            min="10"
-            max="12"
-            autoComplete="off"
-            value={loanInputs.phone}
-            onChange={(event) => {
-              setloanInputs({ ...loanInputs, phone: event.target.value });
-            }}
-            required
-          />
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="age">Age: </label>
-          <input
-            className="form-control"
-            type="number"
-            name="age"
-            id="age"
-            min="25"
-            max="100"
-            autoComplete="off"
-            value={loanInputs.age}
-            onChange={(event) => {
-              setloanInputs({ ...loanInputs, age: event.target.value });
-            }}
-            required
-          ></input>
-        </div>
+        ))}
         <div className="form-group checkbox-group">
           <label htmlFor="employee">Are you an employee?</label>
           <input
